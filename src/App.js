@@ -5,12 +5,14 @@ import {
   Grid,
   GridRow,
   Header,
+  Icon,
   Segment,
 } from "semantic-ui-react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import HeaderText from "./components/HeaderText";
 import axios from "axios";
 import { useState, useEffect } from "react";
+import { device, primaryColor } from "./query";
 
 function App() {
   const [repos, setRepos] = useState([]);
@@ -35,13 +37,28 @@ function App() {
   const renderRepos = () => {
     return repos.map((r) => {
       return (
-        <Grid.Column key={r.id} width={4}>
-          <Card>
+        <Grid.Column key={r.id} mobile={16} tablet={8} computer={4}>
+          <StyleCard fluid>
             <Card.Content>
-              <Card.Header>{r.name}</Card.Header>
+              <Card.Header>
+                <Truncated>{r.full_name}</Truncated>
+              </Card.Header>
+              <Card.Meta>
+                Issues: {r.open_issues}
+                {r.stargazers_count > 0 && (
+                  <Star>
+                    <Icon size="large" name="star" />
+                  </Star>
+                )}
+              </Card.Meta>
+              <Card.Description>{r.description}</Card.Description>
             </Card.Content>
-            <Card.Meta>{r.description}</Card.Meta>
-          </Card>
+            <Card.Content extra>
+              <ButtonLink href={r.html_url} target="_blank">
+                view
+              </ButtonLink>
+            </Card.Content>
+          </StyleCard>
         </Grid.Column>
       );
     });
@@ -53,15 +70,83 @@ function App() {
       <Segment as={Transparent}>
         <HeaderText size="med">My Projects</HeaderText>
         <Grid>
-          <Grid.Row>{renderRepos()}</Grid.Row>
+          <Grid.Row stretched>{renderRepos()}</Grid.Row>
         </Grid>
       </Segment>
       <Segment as={Transparent}>
         <HeaderText>Contacts</HeaderText>
       </Segment>
+      <CardWrapper>
+        <MyCard>yo</MyCard>
+        <MyCard>yo</MyCard>
+        <MyCard>yo</MyCard>
+        <MyCard>yo</MyCard>
+        <MyCard>yo</MyCard>
+        <MyCard>yo</MyCard>
+      </CardWrapper>
     </AppContainer>
   );
 }
+
+const MyCard = styled.div`
+  margin: 20px;
+  width: 200px;
+`;
+const CardWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  background-color: ${primaryColor};
+  @media ${device.laptop} {
+    flex-direction: column;
+    background-color: green;
+  }
+  @media ${device.mobileL} {
+    flex-direction: column;
+    background-color: purple;
+  }
+`;
+const ButtonLink = styled.a`
+  float: right;
+  padding: 10px 30px;
+  border-raduis: 10px;
+  color: white !important;
+  background-color: ${primaryColor};
+
+  &:hover {
+    background: pink;
+  }
+
+  &:visited {
+    background: orange;
+  }
+`;
+
+const rotate360 = keyframes`
+from {
+  transform:rotate(0deg);
+  color: red;
+}
+to {
+  transform:rotate(360deg);
+  color: blue;
+}
+`;
+const Star = styled.div`
+  fontsize: 30px;
+  display: inline-block;
+  color: red;
+  animation: ${rotate360} 2s linear infinite;
+`;
+const Truncated = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
+const StyleCard = styled(Card)`
+  height: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`;
 
 const Transparent = styled.div`
   background: transparent !important;
